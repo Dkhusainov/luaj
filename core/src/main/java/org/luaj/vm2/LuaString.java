@@ -255,10 +255,6 @@ public class LuaString extends LuaValue {
 	public String typename() {
 		return "string";
 	}
-	
-	public String tojstring() {
-		return decodeAsUtf8(m_bytes, m_offset, m_length);
-	}
 
 	// unary operators
 	public LuaValue neg() { double d = scannumber(); return Double.isNaN(d)? super.neg(): valueOf(-d); }
@@ -310,7 +306,7 @@ public class LuaString extends LuaValue {
 	public LuaValue concat(LuaValue rhs)      { return rhs.concatTo(this); }
 	public Buffer   concat(Buffer rhs)        { return rhs.concatTo(this); }
 	public LuaValue concatTo(LuaNumber lhs)   { return concatTo(lhs.strvalue()); }
-	public LuaValue concatTo(LuaString lhs)   { 
+	public LuaValue concatTo(LuaString lhs)   {
 		byte[] b = new byte[lhs.m_length+this.m_length];
 		System.arraycopy(lhs.m_bytes, lhs.m_offset, b, 0, lhs.m_length);
 		System.arraycopy(this.m_bytes, this.m_offset, b, lhs.m_length, this.m_length);

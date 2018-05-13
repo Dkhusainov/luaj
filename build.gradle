@@ -9,5 +9,3 @@ buildscript {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.41"
   }
 }
-
-tasks.wrapper.gradleVersion = "4.7"

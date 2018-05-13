@@ -22,13 +22,13 @@
 package org.luaj.vm2;
 
 
+import org.luaj.vm2.lib.MathLib;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-
-import org.luaj.vm2.lib.MathLib;
 
 /**
  * Subclass of {@link LuaValue} for representing lua strings. 
@@ -254,6 +254,10 @@ public class LuaString extends LuaValue {
 
 	public String typename() {
 		return "string";
+	}
+
+	public String tojstring() {
+		return decodeAsUtf8(m_bytes, m_offset, m_length);
 	}
 
 	// unary operators

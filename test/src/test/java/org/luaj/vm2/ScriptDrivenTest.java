@@ -67,7 +67,7 @@ public class ScriptDrivenTest extends TestCase implements ResourceFinder {
 			globals = org.luaj.vm2.lib.jse.JsePlatform.debugGlobals();
 			break;
 		case JME:
-			globals = org.luaj.vm2.lib.jme.JmePlatform.debugGlobals();
+//			globals = org.luaj.vm2.lib.jme.JmePlatform.debugGlobals();
 			break;
 		}
 	}

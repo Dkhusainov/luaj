@@ -76,37 +76,16 @@ public class CompatibiltyTest extends TestSuite {
 
 	public static TestSuite suite() {
 		TestSuite suite = new TestSuite("Compatibility Tests");
-		suite.addTest( new TestSuite( JseCompatibilityTest.class,   "JSE Compatibility Tests" ) );
-		suite.addTest( new TestSuite( JmeCompatibilityTest.class,   "JME Compatibility Tests" ) );
 		suite.addTest( new TestSuite( LuaJCCompatibilityTest.class,        "LuaJC Compatibility Tests" ) );
 		return suite;
 	}
-	
-	public static class JmeCompatibilityTest extends CompatibiltyTestSuite {
-		public JmeCompatibilityTest() {
-			super(ScriptDrivenTest.PlatformType.JME);
-		}
-		protected void setUp() throws Exception {
-			System.setProperty("JME", "true");
-			super.setUp();
-		}
-	}
-	public static class JseCompatibilityTest extends CompatibiltyTestSuite {
-		public JseCompatibilityTest() {
-			super(ScriptDrivenTest.PlatformType.JSE);
-		}
-		protected void setUp() throws Exception {
-			super.setUp();
-			System.setProperty("JME", "false");
-		}
-	}
+
 	public static class LuaJCCompatibilityTest extends CompatibiltyTestSuite {
 		public LuaJCCompatibilityTest() {
 			super(ScriptDrivenTest.PlatformType.LUAJIT);
 		}
 		protected void setUp() throws Exception {
 			super.setUp();
-			System.setProperty("JME", "false");
 			LuaJC.install(globals);
 		}
 		// not supported on this platform - don't test

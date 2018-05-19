@@ -127,6 +127,12 @@ public class LuaClosure extends LuaFunction {
 	}
 	
 	public final LuaValue call() {
+//		LuaValue[] stack = LuajOptimizations.INSTANCE.acquireStackOfSize(p.maxstacksize);
+//		for (int i = 0; i < p.numparams; ++i )
+//			stack[i] = NIL;
+//		Varargs result = execute(stack,NONE);
+//		LuajOptimizations.INSTANCE.releaseStackOfSize(p.maxstacksize, stack);
+//		return result.arg1();
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
 		for (int i = 0; i < p.numparams; ++i )
 			stack[i] = NIL;
@@ -134,8 +140,23 @@ public class LuaClosure extends LuaFunction {
 	}
 
 	public final LuaValue call(LuaValue arg) {
+//		LuaValue[] stack = LuajOptimizations.INSTANCE.acquireStackOfSize(p.maxstacksize);
+//		for (int i = 1; i < p.numparams; ++i )
+//			stack[i] = NIL;
+//		Varargs result;
+//		switch (p.numparams) {
+//			default:
+//				stack[0] = arg;
+//				result = execute(stack, NONE);
+//				break;
+//			case 0:
+//				result = execute(stack, arg);
+//				break;
+//		}
+//		LuajOptimizations.INSTANCE.releaseStackOfSize(p.maxstacksize, stack);
+//		return result.arg1();
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
-		System.arraycopy(NILS, 0, stack, 0, p.maxstacksize);
+//		System.arraycopy(NILS, 0, stack, 0, p.maxstacksize);
 		for (int i = 1; i < p.numparams; ++i )
 			stack[i] = NIL;
 		switch ( p.numparams ) {
@@ -145,6 +166,37 @@ public class LuaClosure extends LuaFunction {
 	}
 	
 	public final LuaValue call(LuaValue arg1, LuaValue arg2) {
+//		LuaValue[] stack = LuajOptimizations.INSTANCE.acquireStackOfSize(p.maxstacksize);
+//		for (int i = 2; i < p.numparams; ++i )
+//			stack[i] = NIL;
+//		Varargs result;
+//		switch (p.numparams) {
+//			default:
+//				stack[0] = arg1;
+//				stack[1] = arg2;
+//				result = execute(stack, NONE);
+//				break;
+//			case 1:
+//				stack[0] = arg1;
+//				result = execute(stack, arg2);
+//				break;
+//			case 0:
+//				if (p.is_vararg != 0) {
+//					if (arg2.narg() == 0) {
+//						result = execute(stack, arg1);
+//					} else {
+//						PairVarargs pooledVararg = LuajOptimizations.INSTANCE.acquirePairVarargs(arg1, arg2);
+//						result = execute(stack, pooledVararg);
+//						LuajOptimizations.INSTANCE.releasePairVarargs(pooledVararg);
+//					}
+//					result = execute(stack, varargsOf(arg1, arg2));
+//				} else {
+//					result = execute(stack, NONE);
+//				}
+//				break;
+//		}
+//		LuajOptimizations.INSTANCE.releaseStackOfSize(p.maxstacksize, stack);
+//		return result.arg1();
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
 		for (int i = 2; i < p.numparams; ++i )
 			stack[i] = NIL;
@@ -156,6 +208,43 @@ public class LuaClosure extends LuaFunction {
 	}
 
 	public final LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {
+//		LuaValue[] stack = LuajOptimizations.INSTANCE.acquireStackOfSize(p.maxstacksize);
+//		for (int i = 3; i < p.numparams; ++i )
+//			stack[i] = NIL;
+//		Varargs result;
+//		switch (p.numparams) {
+//			default:
+//				stack[0] = arg1;
+//				stack[1] = arg2;
+//				stack[2] = arg3;
+//				result = execute(stack, NONE);
+//				break;
+//			case 2:
+//				stack[0] = arg1;
+//				stack[1] = arg2;
+//				result = execute(stack, arg3);
+//				break;
+//			case 1:
+//				stack[0] = arg1;
+//				if (p.is_vararg != 0) {
+//					if (arg3.narg() == 0) {
+//						result = execute(stack, arg2);
+//					} else {
+//						PairVarargs pooledVararg = LuajOptimizations.INSTANCE.acquirePairVarargs(arg2, arg3);
+//						result = execute(stack, pooledVararg);
+//						LuajOptimizations.INSTANCE.releasePairVarargs(pooledVararg);
+//					}
+//					result = execute(stack, varargsOf(arg2, arg3));
+//				} else {
+//					result = execute(stack, NONE);
+//				}
+//				break;
+//			case 0:
+//				result = execute(stack, p.is_vararg != 0 ? varargsOf(arg1, arg2, arg3) : NONE);
+//				break;
+//		}
+//		LuajOptimizations.INSTANCE.releaseStackOfSize(p.maxstacksize, stack);
+//		return result.arg1();
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
 		for (int i = 3; i < p.numparams; ++i )
 			stack[i] = NIL;
@@ -172,6 +261,12 @@ public class LuaClosure extends LuaFunction {
 	}
 	
 	public final Varargs onInvoke(Varargs varargs) {
+//		LuaValue[] stack = LuajOptimizations.INSTANCE.acquireStackOfSize(p.maxstacksize);
+//		for ( int i=0; i<p.numparams; i++ )
+//			stack[i] = varargs.arg(i+1);
+//		Varargs r = execute(stack, p.is_vararg != 0 ? varargs.subargs(p.numparams + 1) : NONE);
+//		LuajOptimizations.INSTANCE.releaseStackOfSize(p.maxstacksize, stack);
+//		return r;
 		LuaValue[] stack = new LuaValue[p.maxstacksize];
 		for ( int i=0; i<p.numparams; i++ )
 			stack[i] = varargs.arg(i+1);		
@@ -189,17 +284,17 @@ public class LuaClosure extends LuaFunction {
 		// upvalues are only possible when closures create closures
 		// TODO: use linked list.
 		UpValue[] openups = p.p.length>0? new UpValue[stack.length]: null;
-		
+
 		// allow for debug hooks
-		if (globals != null && globals.debuglib != null)
-			globals.debuglib.onCall( this, varargs, stack ); 
+//		if (globals != null && globals.debuglib != null)
+//			globals.debuglib.onCall( this, varargs, stack );
 
 		// process instructions
 		try {
 			for (; true; ++pc) {
-				if (globals != null && globals.debuglib != null)
-					globals.debuglib.onInstruction( pc, v, top ); 
-				
+//				if (globals != null && globals.debuglib != null)
+//					globals.debuglib.onInstruction( pc, v, top );
+
 				// pull out instruction
 				i = code[pc];
 				a = ((i>>6) & 0xff);
@@ -364,9 +459,35 @@ public class LuaClosure extends LuaFunction {
 					default:
 						b = i>>>23;
 						c = (i>>14)&0x1ff;
-						v = stack[a].invoke(b>0? 
-							varargsOf(stack, a+1, b-1): // exact arg count
-							varargsOf(stack, a+1, top-v.narg()-(a+1), v));  // from prev top 
+						if (b > 0) {
+							int offset = a + 1;
+							switch (b - 1) {
+								case 0: {
+									v = stack[a].invoke(NONE);
+									break;
+								}
+								case 1: {
+									v = stack[a].invoke(stack[offset]);
+									break;
+								}
+								case 2: {
+									if (stack[offset + 1].narg() == 0) {
+										v = stack[a].invoke(stack[offset]);
+									} else {
+										PairVarargs arg = LuajOptimizations.acquirePairVarargs(stack[offset], stack[offset + 1]);
+										v = stack[a].invoke(arg);
+										LuajOptimizations.releasePairVarargs(arg);
+									}
+									break;
+								}
+								default: {
+									v = stack[a].invoke(new Varargs.ArrayPartVarargs(stack, offset, b - 1, NONE));
+									break;
+								}
+							}
+						} else {
+							v = stack[a].invoke(varargsOf(stack, a + 1, top - v.narg() - (a + 1), v));
+						}
 						if ( c > 0 ) {
 							v.copyto(stack, a, c-1);
 							v = NONE;
@@ -427,7 +548,13 @@ public class LuaClosure extends LuaFunction {
 					continue;
 
 				case Lua.OP_TFORCALL: /* A C	R(A+3), ... ,R(A+2+C) := R(A)(R(A+1), R(A+2));	*/
-					v = stack[a].invoke(varargsOf(stack[a+1],stack[a+2]));
+					if (stack[a + 2].narg() == 0) {
+						v = stack[a].invoke(stack[a + 1]);
+					} else {
+						PairVarargs funcInput = LuajOptimizations.acquirePairVarargs(stack[a + 1], stack[a + 2]);
+						v = stack[a].invoke(funcInput);
+						LuajOptimizations.releasePairVarargs(funcInput);
+					}
 					c = (i>>14) & 0x1ff;
 					while (--c >= 0)
 						stack[a+3+c] = v.arg(c+1);
@@ -509,8 +636,8 @@ public class LuaClosure extends LuaFunction {
 				for ( int u=openups.length; --u>=0; )
 					if ( openups[u] != null )
 						openups[u].close();
-			if (globals != null && globals.debuglib != null)
-				globals.debuglib.onReturn();
+//			if (globals != null && globals.debuglib != null)
+//				globals.debuglib.onReturn();
 		}
 	}
 

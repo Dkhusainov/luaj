@@ -256,7 +256,7 @@ public class Globals extends LuaTable {
 		} catch (LuaError l) {
 			throw l;
 		} catch (Exception e) {
-			return error("load "+chunkname+": "+e);
+			throw new RuntimeException("load "+chunkname, e);
 		}
 	}
 

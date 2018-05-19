@@ -551,9 +551,9 @@ public abstract class Varargs {
 	 *  
 	 * @see LuaValue#varargsOf(LuaValue, Varargs)
 	 */
-	static final class PairVarargs extends Varargs {
-		private final LuaValue v1;
-		private final Varargs v2;
+	public static final class PairVarargs extends Varargs {
+		public LuaValue v1;
+		public Varargs v2;
 		/** Construct a Varargs from an two LuaValue. 
 		 * <p>
 		 * This is an internal class not intended to be used directly.

@@ -22,6 +22,7 @@
 package org.luaj.vm2.lib;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.LuajOptimizations;
 import org.luaj.vm2.Varargs;
 
 /** Abstract base class for Java function implementations that takes varaiable arguments and 
@@ -59,7 +60,15 @@ abstract public class VarArgFunction extends LibFunction {
 	}
 
 	public LuaValue call(LuaValue arg1, LuaValue arg2) {
-		return invoke(varargsOf(arg1,arg2)).arg1();
+		Varargs result;
+		if (arg2.narg() == 0) {
+			result = invoke(arg1);
+		} else {
+			PairVarargs funcInput = LuajOptimizations.acquirePairVarargs(arg1, arg2);
+			result = invoke(funcInput);
+			LuajOptimizations.releasePairVarargs(funcInput);
+		}
+		return result.arg1();
 	}
 
 	public LuaValue call(LuaValue arg1, LuaValue arg2, LuaValue arg3) {

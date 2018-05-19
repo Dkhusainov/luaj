@@ -160,7 +160,7 @@ public class LoadState {
 	private static final int[]       NOINTS      = {};
 	
 	/** Read buffer */
-	private byte[] buf = new byte[512];
+	private byte[] buf = LuajOptimizations.acquireByteArray(512);
 
 	/** Install this class as the standard Globals.Undumper for the supplied Globals */
 	public static void install(Globals globals) {
@@ -187,8 +187,11 @@ public class LoadState {
 		
 		// read all data at once
 		int m = n << 2;
-		if ( buf.length < m )
-			buf = new byte[m];
+		if ( buf.length < m ) {
+			byte[] old = buf;
+			buf = LuajOptimizations.acquireByteArray(m);
+			LuajOptimizations.releaseByteArray(old);
+		}
 		is.readFully(buf,0,m);
 		int[] array = new int[n];
 		for ( int i=0, j=0; i<n; ++i, j+=4 )

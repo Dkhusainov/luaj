@@ -60,6 +60,7 @@ import java.io.PrintStream;
  * @see LuaValue#valueOf(byte[])
  */
 public class LuaString extends LuaValue {
+    static final int RECENT_STRINGS_MAX_LENGTH = 32;
 
 	/** The singleton instance for string metatables that forwards to the string functions.
 	 * Typically, this is set to the string metatable as a side effect of loading the string
@@ -83,27 +84,6 @@ public class LuaString extends LuaValue {
 	
 	/** The hashcode for this string.  Computed at construct time. */
 	private final int m_hashcode;
-
-	/** Size of cache of recent short strings. This is the maximum number of LuaStrings that 
-	 * will be retained in the cache of recent short strings.  Exposed to package for testing. */
-	static final int RECENT_STRINGS_CACHE_SIZE = 128;
-
-	/** Maximum length of a string to be considered for recent short strings caching. 
-	 * This effectively limits the total memory that can be spent on the recent strings cache,
-	 * because no LuaString whose backing exceeds this length will be put into the cache.  
-	 * Exposed to package for testing. */
-	static final int RECENT_STRINGS_MAX_LENGTH = 32;
-
-	/** Simple cache of recently created strings that are short.  
-	 * This is simply a list of strings, indexed by their hash codes modulo the cache size 
-	 * that have been recently constructed.  If a string is being constructed frequently 
-	 * from different contexts, it will generally show up as a cache hit and resolve 
-	 * to the same value.  */
-	private static final class RecentShortStrings {
-		private static final LuaString recent_short_strings[] = 
-				new LuaString[RECENT_STRINGS_CACHE_SIZE];
-	}
-
 	/**
 	 * Get a {@link LuaString} instance whose bytes match 
 	 * the supplied Java String using the UTF8 encoding. 
@@ -111,10 +91,14 @@ public class LuaString extends LuaValue {
 	 * @return {@link LuaString} with UTF8 bytes corresponding to the supplied String
 	 */
 	public static LuaString valueOf(String string) {
+		LuaString orCreateLuaString = LuajOptimizations.getOrCreateLuaString(string);
+		return orCreateLuaString;
+		/*
 		char[] c = string.toCharArray();
 		byte[] b = new byte[lengthAsUtf8(c)];
 		encodeToUtf8(c, c.length, b, 0);
 		return valueUsing(b, 0, b.length);
+		**/
 	}
 
 	/** Construct a {@link LuaString} for a portion of a byte array.
@@ -130,21 +114,13 @@ public class LuaString extends LuaValue {
 	 * @return {@link LuaString} wrapping the byte buffer
 	 */
 	public static LuaString valueOf(byte[] bytes, int off, int len) {
-		if (len > RECENT_STRINGS_MAX_LENGTH)
-			return valueFromCopy(bytes, off, len);
-		final int hash = hashCode(bytes, off, len);
-		final int bucket = hash & (RECENT_STRINGS_CACHE_SIZE - 1);
-		final LuaString t = RecentShortStrings.recent_short_strings[bucket];
-		if (t != null && t.m_hashcode == hash && t.byteseq(bytes, off, len)) return t;
-		final LuaString s = valueFromCopy(bytes, off, len);
-		RecentShortStrings.recent_short_strings[bucket] = s;
-		return s;
+		return valueFromCopy(bytes, off, len);
 	}
 
 	/** Construct a new LuaString using a copy of the bytes array supplied */
 	private static LuaString valueFromCopy(byte[] bytes, int off, int len) {
-		final byte[] copy = new byte[len];
-		for (int i=0; i<len; ++i) copy[i] = bytes[off+i];
+		final byte[] copy = LuajOptimizations.acquireByteArray(len);
+		System.arraycopy(bytes, off, copy, 0, len);
 		return new LuaString(copy, 0, len);
 	}
 
@@ -159,15 +135,7 @@ public class LuaString extends LuaValue {
 	 * @return {@link LuaString} wrapping the byte buffer, or an equivalent string.
 	 */
 	static public LuaString valueUsing(byte[] bytes, int off, int len) {
-		if (bytes.length > RECENT_STRINGS_MAX_LENGTH)
-			return new LuaString(bytes, off, len);
-		final int hash = hashCode(bytes, off, len);
-		final int bucket = hash & (RECENT_STRINGS_CACHE_SIZE - 1);
-		final LuaString t = RecentShortStrings.recent_short_strings[bucket];
-		if (t != null && t.m_hashcode == hash && t.byteseq(bytes, off, len)) return t;
-		final LuaString s = new LuaString(bytes, off, len);
-		RecentShortStrings.recent_short_strings[bucket] = s;
-		return s;
+		return valueFromCopy(bytes, off, len);
 	}
 
 	/** Construct a {@link LuaString} using the supplied characters as byte values.
@@ -233,7 +201,7 @@ public class LuaString extends LuaValue {
 	 * @param length length of the byte buffer
 	 * @return {@link LuaString} wrapping the byte buffer
 	 */
-	private LuaString(byte[] bytes, int offset, int length) {
+	LuaString(byte[] bytes, int offset, int length) {
 		this.m_bytes = bytes;
 		this.m_offset = offset;
 		this.m_length = length;
@@ -311,10 +279,13 @@ public class LuaString extends LuaValue {
 	public Buffer   concat(Buffer rhs)        { return rhs.concatTo(this); }
 	public LuaValue concatTo(LuaNumber lhs)   { return concatTo(lhs.strvalue()); }
 	public LuaValue concatTo(LuaString lhs)   {
+		return LuajOptimizations.concatLuaStrings(lhs, this);
+		/*
 		byte[] b = new byte[lhs.m_length+this.m_length];
 		System.arraycopy(lhs.m_bytes, lhs.m_offset, b, 0, lhs.m_length);
 		System.arraycopy(this.m_bytes, this.m_offset, b, lhs.m_length, this.m_length);
 		return valueUsing(b, 0, b.length);
+		 */
 	}
 
 	// string comparison 
@@ -638,9 +609,10 @@ public class LuaString extends LuaValue {
 	 */
 	public static String decodeAsUtf8(byte[] bytes, int offset, int length) {
 		int i,j,n,b;
-		for ( i=offset,j=offset+length,n=0; i<j; ++n ) {
-			switch ( 0xE0 & bytes[i++] ) {
-			case 0xE0: ++i;
+		for (i = offset, j = offset + length, n = 0; i < j; ++n) {
+			switch (0xE0 & bytes[i++]) {
+				case 0xE0:
+					++i;
 			case 0xC0: ++i;
 			}
 		}
@@ -652,6 +624,23 @@ public class LuaString extends LuaValue {
 					(((b&0xf) << 12) | ((bytes[i++]&0x3f)<<6) | (bytes[i++]&0x3f)));
 		}
 		return new String(chars);
+	}
+
+	public void decodeAsUtf8Into(char[] chars) {
+		int i,j,n,b;
+		for (i = m_offset, j = m_offset + m_length, n = 0; i < j; ++n) {
+			switch (0xE0 & m_bytes[i++]) {
+				case 0xE0:
+					++i;
+			case 0xC0: ++i;
+			}
+		}
+		for ( i=m_offset,j=m_offset+m_length,n=0; i<j; ) {
+			chars[n++] = (char) (
+				((b=m_bytes[i++])>=0||i>=j)? b:
+				(b<-32||i+1>=j)? (((b&0x3f) << 6) | (m_bytes[i++]&0x3f)):
+					(((b&0xf) << 12) | ((m_bytes[i++]&0x3f)<<6) | (m_bytes[i++]&0x3f)));
+		}
 	}
 	
 	/**

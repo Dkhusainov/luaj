@@ -22,6 +22,7 @@
 package org.luaj.vm2;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.Vector;
 
 /**
@@ -180,8 +181,10 @@ public class LuaTable extends LuaValue implements Metatable {
 
 	/** Resize the table */
 	private static LuaValue[] resize( LuaValue[] old, int n ) {
-		LuaValue[] v = new LuaValue[n];
+		LuaValue[] v = LuajOptimizations.acquireStackOfSize(n);
 		System.arraycopy(old, 0, v, 0, old.length);
+		LuajOptimizations.releaseStackOfSize(old.length, old
+		);
 		return v;
 	}
 	
@@ -641,7 +644,8 @@ public class LuaTable extends LuaValue implements Metatable {
 				dropWeakArrayValues();
 			}
 		}
-		int[] nums = new int[32];
+		int[] nums = LuajOptimizations.getIntArray32();
+		Arrays.fill(nums, 0);
 		int total = countIntKeys(nums);
 		if ( newKey > 0 ) {
 			total++;
@@ -751,7 +755,7 @@ public class LuaTable extends LuaValue implements Metatable {
 	protected static boolean isLargeKey(LuaValue key) {
 		switch (key.type()) {
 		case TSTRING:
-			return key.rawlen() > LuaString.RECENT_STRINGS_MAX_LENGTH;
+			return key.rawlen() > LuajOptimizations.MAX_SIZE_OF_CACHED_STRING;
 		case TNUMBER:
 		case TBOOLEAN:
 			return false;

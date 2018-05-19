@@ -68,7 +68,7 @@ public final class Buffer {
 	 * @param initialCapacity the initial capacity
 	 */
 	public Buffer( int initialCapacity ) {
-		bytes = new byte[ initialCapacity ];
+		bytes = LuajOptimizations.acquireByteArray(initialCapacity);
 		length = 0;
 		offset = 0;
 		value = null;
@@ -108,7 +108,7 @@ public final class Buffer {
 	 * @return the value as a {@link LuaString}
 	 */
 	public final LuaString tostring() {
-		realloc( length, 0 );
+//		realloc( length, 0 );
 		return LuaString.valueOf( bytes, offset, length );
 	}
 	
@@ -224,8 +224,10 @@ public final class Buffer {
 			value = null;
 			length = s.m_length;
 			offset = nbefore;
-			bytes = new byte[nbefore+length+nafter];
+			byte[] old = bytes;
+			bytes = LuajOptimizations.acquireByteArray(nbefore+length+nafter);
 			System.arraycopy(s.m_bytes, s.m_offset, bytes, offset, length);
+			LuajOptimizations.releaseByteArray(old);
 		} else if ( offset+length+nafter > bytes.length || offset<nbefore ) {
 			int n = nbefore+length+nafter;
 			int m = n<32? 32: n<length*2? length*2: n;
@@ -239,8 +241,9 @@ public final class Buffer {
 	 */
 	private final void realloc( int newSize, int newOffset ) {
 		if ( newSize != bytes.length ) {
-			byte[] newBytes = new byte[ newSize ];
+			byte[] newBytes = LuajOptimizations.acquireByteArray(newSize);
 			System.arraycopy( bytes, offset, newBytes, newOffset, length );
+			LuajOptimizations.releaseByteArray(bytes);
 			bytes = newBytes;
 			offset = newOffset;
 		}

@@ -23,6 +23,7 @@ package org.luaj.vm2.lib;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.luaj.vm2.LuaClosure;
 import org.luaj.vm2.Buffer;
@@ -842,20 +843,20 @@ public class StringLib extends TwoArgFunction {
 		final LuaString p;
 		final Varargs args;
 		int level;
-		int[] cinit;
-		int[] clen;
-		
+		private static int[] cinit = new int[MAX_CAPTURES];
+		private static int[] clen = new int[MAX_CAPTURES];
+
 		MatchState( Varargs args, LuaString s, LuaString pattern ) {
 			this.s = s;
 			this.p = pattern;
 			this.args = args;
 			this.level = 0;
-			this.cinit = new int[ MAX_CAPTURES ];
-			this.clen = new int[ MAX_CAPTURES ];
 		}
 		
 		void reset() {
 			level = 0;
+//			Arrays.fill(cinit, 0);
+//			Arrays.fill(clen, 0);
 		}
 		
 		private void add_s( Buffer lbuf, LuaString news, int soff, int e ) {

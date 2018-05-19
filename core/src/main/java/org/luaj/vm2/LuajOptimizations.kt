@@ -60,7 +60,7 @@ object LuajOptimizations {
     }
   }
 
-  private val buffer = ByteArray(4 * 1024)
+  private val buffer = ByteArray(8 * 1024)
   fun toLuaString(string: String): LuaString {
     val chars = string.toCharArray()
     val length = LuaString.lengthAsUtf8(chars)
@@ -74,7 +74,7 @@ object LuajOptimizations {
   }
 
   private val sb = StringBuilder()
-  private val charBuffer = CharArray(2 * 1024)
+  private val charBuffer = CharArray(8 * 1024)
   @JvmStatic
   fun concatLuaStrings(one: LuaString, two: LuaString): LuaString {
     checkThread()

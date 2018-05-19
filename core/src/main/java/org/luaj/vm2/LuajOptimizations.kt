@@ -65,8 +65,8 @@ object LuajOptimizations {
     val chars = string.toCharArray()
     val length = LuaString.lengthAsUtf8(chars)
     val buf = when {
-      string.length > buffer.size -> ByteArray(string.length * 2)
-      else                        -> buffer
+      length > buffer.size -> ByteArray(length * 2)
+      else                 -> buffer
     }
     LuaString.encodeToUtf8(chars, chars.size, buf, 0)
     val actualStringBytes = Arrays.copyOf(buf, length)

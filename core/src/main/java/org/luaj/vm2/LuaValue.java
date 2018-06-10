@@ -3298,7 +3298,7 @@ public class LuaValue extends Varargs {
 				if ((!res.isnil()) || (tm = t.metatag(INDEX)).isnil())
 					return res;
 			} else if ((tm = t.metatag(INDEX)).isnil())
-				t.indexerror();
+				t.indexerror(key.tojstring());
 			if (tm.isfunction())
 				return tm.call(t, key);
 			t = tm;
@@ -3389,8 +3389,8 @@ public class LuaValue extends Varargs {
 	/** Throw {@link LuaError} indicating index was attempted on illegal type 
 	 * @throws LuaError when called.  
 	 */
-    private void indexerror() {
-		error( "attempt to index ? (a "+typename()+" value)" );
+    private void indexerror(String msg) {
+		error( msg + " attempt to index ? (a "+typename()+" value)" );
 	}
  	
 	/** Construct a {@link Varargs} around an array of {@link LuaValue}s.

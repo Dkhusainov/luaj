@@ -71,7 +71,9 @@ public class Bit32Lib extends TwoArgFunction {
 			"arshift", "lrotate", "lshift", "rrotate", "rshift"
 		});
 		env.set("bit32", t);
+		env.set("bit", t);
 		env.get("package").get("loaded").set("bit32", t);
+		env.get("package").get("loaded").set("bit", t);
 		return t;
 	}
 

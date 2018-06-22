@@ -76,16 +76,16 @@ public class LuaTable extends LuaValue implements Metatable {
 	private static final LuaString N = valueOf("n");
 	
 	/** the array values */
-	protected LuaValue[] array;
+	public LuaValue[] array;
 	
 	/** the hash part */
-	protected Slot[] hash;
+	public  Slot[] hash;
 	
 	/** the number of hash entries */
-	protected int hashEntries;
+	public int hashEntries;
 	
 	/** metatable for this table, or null */
-	protected Metatable m_metatable;
+	public  Metatable m_metatable;
 	
 	/** Construct empty table */
 	public LuaTable() {
@@ -287,7 +287,7 @@ public class LuaTable extends LuaValue implements Metatable {
 	}
 
 	/** Set an array element */
-	private boolean arrayset( int key, LuaValue value ) {
+	public boolean arrayset( int key, LuaValue value ) {
 		if ( key>0 && key<=array.length ) {
 			array[key - 1] = value.isnil() ? null :
 				(m_metatable != null ? m_metatable.wrap(value) : value);

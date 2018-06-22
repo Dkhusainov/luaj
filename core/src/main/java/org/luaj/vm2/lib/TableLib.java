@@ -21,6 +21,7 @@
 ******************************************************************************/
 package org.luaj.vm2.lib;
 
+import org.luaj.vm2.LuaClosure;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
@@ -68,7 +69,7 @@ public class TableLib extends TwoArgFunction {
 		table.set("pack", new pack());
 		table.set("remove", new remove());
 		table.set("sort", new sort());
-		table.set("unpack", new unpack());
+		env.set("unpack", new unpack());
 		env.set("table", table);
 		env.get("package").get("loaded").set("table", table);
 		return NIL;
@@ -145,6 +146,7 @@ public class TableLib extends TwoArgFunction {
 	// "unpack", // (list [,i [,j]]) -> result1, ...
 	static class unpack extends VarArgFunction {
 		public Varargs invoke(Varargs args) {
+			if (args.isnil(1)) return LuaValue.NONE;
 			LuaTable t = args.checktable(1);
 			switch (args.narg()) {
 			case 1: return t.unpack();

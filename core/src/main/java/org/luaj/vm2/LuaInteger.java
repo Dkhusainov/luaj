@@ -42,14 +42,14 @@ import org.luaj.vm2.lib.MathLib;
  */
 public class LuaInteger extends LuaNumber {
 
-	private static final LuaInteger[] intValues = new LuaInteger[512];
+	private static final LuaInteger[] intValues = new LuaInteger[2048];
 	static {
-		for ( int i=0; i<512; i++ )
-			intValues[i] = new LuaInteger(i-256);
+		for ( int i=0; i<2048; i++ )
+			intValues[i] = new LuaInteger(i-1024);
 	}
 
 	public static LuaInteger valueOf(int i) {
-		return i<=255 && i>=-256? intValues[i+256]: new LuaInteger(i);
+		return i<=1023 && i>=-1024? intValues[i+1024]: new LuaInteger(i);
 	};
 	
 	 // TODO consider moving this to LuaValue
@@ -61,7 +61,7 @@ public class LuaInteger extends LuaNumber {
 	 */
 	public static LuaNumber valueOf(long l) {
 		int i = (int) l;
-		return l==i? (i<=255 && i>=-256? intValues[i+256]: 
+		return l==i? (i<=1023 && i>=-1024? intValues[i+1024]:
 			(LuaNumber) new LuaInteger(i)): 
 			(LuaNumber) LuaDouble.valueOf(l);
 	}

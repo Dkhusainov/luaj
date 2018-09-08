@@ -86,11 +86,12 @@ object LuajOptimizations {
       total >= charBuffer.size -> CharArray(total * 2)
       else                     -> charBuffer
     }
-    one.decodeAsUtf8Into(buf)
-    sb.append(buf, 0, one.m_length)
+    //todo функция LuaString.decodeAsUtf8 может вернуть меньше символов чем получила, поэтому берем каунт с нее
+    val n1 = one.decodeAsUtf8Into(buf)
+    sb.append(buf, 0, n1)
 
-    two.decodeAsUtf8Into(buf)
-    sb.append(buf, 0, two.m_length)
+    val n2 = two.decodeAsUtf8Into(buf)
+    sb.append(buf, 0, n2)
 
     return getOrCreateLuaString(sb.toString())
   }

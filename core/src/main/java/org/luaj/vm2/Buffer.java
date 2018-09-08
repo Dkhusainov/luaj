@@ -108,7 +108,9 @@ public final class Buffer {
 	 * @return the value as a {@link LuaString}
 	 */
 	public final LuaString tostring() {
-//		realloc( length, 0 );
+		if (bytes != NOBYTES) {
+			LuajOptimizations.releaseByteArray(bytes);
+		}
 		return LuaString.valueOf( bytes, offset, length );
 	}
 	

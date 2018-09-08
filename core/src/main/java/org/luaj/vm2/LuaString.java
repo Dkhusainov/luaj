@@ -625,7 +625,7 @@ public class LuaString extends LuaValue {
 		return new String(chars);
 	}
 
-	public void decodeAsUtf8Into(char[] chars) {
+	public int decodeAsUtf8Into(char[] chars) {
 		int i,j,n,b;
 		for (i = m_offset, j = m_offset + m_length, n = 0; i < j; ++n) {
 			switch (0xE0 & m_bytes[i++]) {
@@ -640,6 +640,7 @@ public class LuaString extends LuaValue {
 				(b<-32||i+1>=j)? (((b&0x3f) << 6) | (m_bytes[i++]&0x3f)):
 					(((b&0xf) << 12) | ((m_bytes[i++]&0x3f)<<6) | (m_bytes[i++]&0x3f)));
 		}
+		return n;
 	}
 	
 	/**
